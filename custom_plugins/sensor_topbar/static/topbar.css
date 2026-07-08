@@ -1,0 +1,232 @@
+/* Sensor Top Bar - dark modern flat design, compact single-row layout.
+   Intentionally self-contained and theme-independent so it looks consistent
+   regardless of the RotorHazard UI colour settings. */
+
+/* Hidden loader panels the plugin registers on non-settings pages to inject
+   the bar without editing any core template. */
+[id^="ui-custom-sensor_topbar_load_"] { display: none !important; }
+
+#rh-topbar {
+	position: sticky;
+	top: 0;
+	z-index: 900;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	background: #14171d;
+	border-bottom: 1px solid #262b34;
+	font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
+	scrollbar-width: thin;
+	scrollbar-color: #333a45 transparent;
+}
+
+#rh-topbar::-webkit-scrollbar { height: 5px; }
+#rh-topbar::-webkit-scrollbar-thumb { background: #333a45; border-radius: 3px; }
+
+#rh-topbar .rh-tb-brand {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	height: 26px;
+	box-sizing: border-box;
+	padding-right: 8px;
+	border-right: 1px solid #2b313b;
+	color: #ee7a28;
+	font-weight: 700;
+	font-size: 10px;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	flex: 0 0 auto;
+}
+#rh-topbar .rh-tb-brand svg { width: 13px; height: 13px; }
+
+#rh-topbar .rh-tb-demo {
+	padding: 1px 6px;
+	border-radius: 3px;
+	background: #3a2a12;
+	color: #f5a623;
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	flex: 0 0 auto;
+}
+
+/* Vertical separator between logical groups */
+#rh-topbar .rh-tb-sep {
+	width: 1px;
+	height: 16px;
+	background: #2b313b;
+	flex: 0 0 auto;
+	margin: 0 2px;
+}
+
+/* Generic metric tile (single row, fixed height so all blocks align) */
+#rh-topbar .rh-tb-tile {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	height: 26px;
+	box-sizing: border-box;
+	padding: 0 9px;
+	background: #1d222b;
+	border: 1px solid #262b34;
+	border-radius: 6px;
+	flex: 0 0 auto;
+}
+#rh-topbar .rh-tb-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 5px;
+	background: #262d38;
+	color: #8fb7ff;
+	flex: 0 0 auto;
+}
+#rh-topbar .rh-tb-icon svg { width: 13px; height: 13px; }
+
+#rh-topbar .rh-tb-text { display: flex; align-items: baseline; gap: 5px; }
+#rh-topbar .rh-tb-label {
+	font-size: 9px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #7d8798;
+}
+#rh-topbar .rh-tb-value {
+	font-size: 13px;
+	font-weight: 700;
+	color: #eaeef4;
+	font-variant-numeric: tabular-nums;
+}
+#rh-topbar .rh-tb-value .rh-tb-unit {
+	font-size: 10px;
+	font-weight: 600;
+	color: #9aa4b3;
+	margin-left: 1px;
+}
+
+/* Core temperature - emphasised (important) with its own icon colour */
+#rh-topbar .rh-tb-core { border-color: #43302b; }
+#rh-topbar .rh-tb-core .rh-tb-icon { background: #3a2320; color: #ff9d7a; }
+
+/* Battery glyph doubles as the tile icon */
+#rh-topbar .rh-tb-batglyph {
+	position: relative;
+	width: 26px;
+	height: 13px;
+	border: 1.5px solid #4a5261;
+	border-radius: 3px;
+	flex: 0 0 auto;
+}
+#rh-topbar .rh-tb-batglyph::after {
+	content: "";
+	position: absolute;
+	right: -4px;
+	top: 3px;
+	width: 2.5px;
+	height: 6px;
+	background: #4a5261;
+	border-radius: 0 2px 2px 0;
+}
+#rh-topbar .rh-tb-batfill {
+	position: absolute;
+	left: 1px;
+	top: 1px;
+	bottom: 1px;
+	border-radius: 1.5px;
+	transition: width 0.6s ease, background 0.6s ease;
+}
+
+/* "Show more" affordance (network + battery) - a small, subtle chevron.
+   A <span> (not <button>) so global RotorHazard button styles can't inflate it. */
+#rh-topbar .rh-tb-more {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 13px;
+	height: 13px;
+	margin-left: 2px;
+	padding: 0;
+	font-size: 0;
+	line-height: 1;
+	color: #616c7e;
+	cursor: pointer;
+	flex: 0 0 auto;
+	-webkit-appearance: none;
+	appearance: none;
+	background: none;
+	border: none;
+}
+#rh-topbar .rh-tb-more svg { display: block; width: 10px; height: 10px; }
+#rh-topbar .rh-tb-more:hover { color: #cdd6e4; }
+
+/* Detail popover (appended to <body> so the scrolling bar can't clip it).
+   width:max-content keeps it hugging its contents, never full-screen. */
+.rh-tb-popover {
+	position: fixed;
+	z-index: 1000;
+	width: max-content;
+	max-width: 280px;
+	box-sizing: border-box;
+	background: #1d222b;
+	border: 1px solid #313846;
+	border-radius: 7px;
+	padding: 7px 9px;
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+	font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	text-align: left;
+}
+.rh-tb-pop-title {
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #6b7688;
+	margin-bottom: 5px;
+}
+.rh-tb-pop-row {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	padding: 1.5px 0;
+}
+.rh-tb-pop-key {
+	flex: 0 0 auto;
+	min-width: 58px;
+	color: #7d8798;
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+.rh-tb-pop-val {
+	color: #eaeef4;
+	font-size: 12px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+.rh-tb-pop-val .rh-tb-pop-sub {
+	color: #7d8798;
+	font-weight: 600;
+	font-size: 10px;
+	margin-left: 6px;
+}
+
+#rh-topbar .rh-tb-empty {
+	color: #5c6572;
+	font-size: 11px;
+	font-style: italic;
+}
+
+@media (max-width: 640px) {
+	#rh-topbar { padding: 3px 8px; gap: 5px; }
+	#rh-topbar .rh-tb-tile { padding: 0 7px; }
+}
