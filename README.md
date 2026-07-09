@@ -23,7 +23,18 @@ Groups are visually separated. Tiles only appear for sensors that are present.
 Open the RotorHazard web UI → **Settings → Plugins**, find **Sensor Top Bar**
 in the community catalog, install it, and restart the server.
 
-### Manual
+### Via the web UI (Upload)
+
+1. Download **`sensor_topbar.zip`** from the
+   [latest release](https://github.com/izicubed/RotorHazard-Sensor-Top-Bar/releases/latest)
+   (the asset named `sensor_topbar.zip` — **not** the "Source code (zip)").
+2. In RotorHazard → **Settings → Plugins → Upload**, select that `.zip`
+   **as-is** — do not unzip and re-zip it. The archive must contain a single
+   `sensor_topbar/` folder with `manifest.json` inside; a zip whose files sit at
+   the root is rejected with *"Uploaded plugin is invalid."*
+3. Restart the server when prompted.
+
+### Manual (copy folder)
 
 1. Copy the `custom_plugins/sensor_topbar` folder into `<rh-data>/plugins/`
    (typically `~/rh-data/plugins/sensor_topbar/`).
