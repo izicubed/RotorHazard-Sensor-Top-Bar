@@ -1,7 +1,8 @@
 # Sensor Top Bar (RotorHazard plugin)
 
-A dark, modern, flat-design bar pinned to the top of the page, showing live
+A modern, flat-design bar pinned to the top of the page, showing live
 telemetry from whatever sensors are installed — plus live Raspberry Pi load.
+Comes with **dark**, **light** and **auto** (follow browser/OS) colour themes.
 
 - **Network** — connection type (Wi-Fi / Ethernet / both); the IP address(es)
   and adapter names appear on hover or when you click the chevron.
@@ -67,12 +68,13 @@ The System group reads the Pi's load with pure standard-library helpers — no
 Each field degrades gracefully: a tile is simply hidden if the reading is
 unavailable on the current platform.
 
-## Battery configuration
+## Configuration
 
 Open **Settings → Sensor Top Bar** and set:
 
 | Option | Meaning |
 | --- | --- |
+| Theme | Colour scheme of the bar: *Dark* (default), *Light*, or *Auto* — auto follows each viewer's browser/OS light-dark preference. |
 | Battery voltage source | Which sensor reading is the pack voltage. *Auto-detect* picks the first reading measured in volts. |
 | Battery cells (S) | Number of cells in series. |
 | Empty voltage per cell | Per-cell voltage treated as 0 % (e.g. 3.3 V for LiPo). |
