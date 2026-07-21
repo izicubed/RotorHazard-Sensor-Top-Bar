@@ -1,10 +1,73 @@
-/* Sensor Top Bar - dark modern flat design, compact single-row layout.
-   Intentionally self-contained and theme-independent so it looks consistent
-   regardless of the RotorHazard UI colour settings. */
+/* Sensor Top Bar - modern flat design, compact single-row layout.
+   Self-contained and independent of the RotorHazard UI colour settings.
+   Ships two colour schemes driven by CSS variables: dark (default) and light
+   (class .rh-tb-light, applied by topbar.js from the plugin's Theme option). */
 
 /* Hidden loader panels the plugin registers on non-settings pages to inject
    the bar without editing any core template. */
 [id^="ui-custom-sensor_topbar_load_"] { display: none !important; }
+
+/* ------------------------------------------------------------- palettes */
+
+#rh-topbar, .rh-tb-popover {
+	/* dark scheme (default) */
+	--tb-bg: #14171d;
+	--tb-edge: #262b34;          /* bar bottom border */
+	--tb-tile-bg: #1d222b;
+	--tb-tile-border: #262b34;
+	--tb-icon-bg: #262d38;
+	--tb-icon-fg: #8fb7ff;
+	--tb-label: #7d8798;
+	--tb-value: #eaeef4;
+	--tb-unit: #9aa4b3;
+	--tb-sep: #2b313b;
+	--tb-brand: #ee7a28;
+	--tb-demo-bg: #3a2a12;
+	--tb-demo-fg: #f5a623;
+	--tb-core-border: #43302b;
+	--tb-core-icon-bg: #3a2320;
+	--tb-core-icon-fg: #ff9d7a;
+	--tb-bat-outline: #4a5261;
+	--tb-more: #616c7e;
+	--tb-more-hover: #cdd6e4;
+	--tb-pop-bg: #1d222b;
+	--tb-pop-border: #313846;
+	--tb-pop-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+	--tb-pop-title: #6b7688;
+	--tb-empty: #5c6572;
+	--tb-scrollbar: #333a45;
+}
+
+#rh-topbar.rh-tb-light, .rh-tb-popover.rh-tb-light {
+	/* light scheme */
+	--tb-bg: #f7f8fa;
+	--tb-edge: #dfe3ea;
+	--tb-tile-bg: #ffffff;
+	--tb-tile-border: #e2e6ed;
+	--tb-icon-bg: #edf2fa;
+	--tb-icon-fg: #3b6fd4;
+	--tb-label: #6b7381;
+	--tb-value: #1c2330;
+	--tb-unit: #6b7381;
+	--tb-sep: #dfe3ea;
+	--tb-brand: #d0620f;
+	--tb-demo-bg: #fdeccc;
+	--tb-demo-fg: #9a6a00;
+	--tb-core-border: #f3d9cf;
+	--tb-core-icon-bg: #fdeae2;
+	--tb-core-icon-fg: #d4552a;
+	--tb-bat-outline: #9aa4b3;
+	--tb-more: #8a93a3;
+	--tb-more-hover: #39424f;
+	--tb-pop-bg: #ffffff;
+	--tb-pop-border: #d8dde6;
+	--tb-pop-shadow: 0 8px 22px rgba(30, 40, 60, 0.18);
+	--tb-pop-title: #8a93a3;
+	--tb-empty: #98a0ad;
+	--tb-scrollbar: #c6ccd6;
+}
+
+/* ------------------------------------------------------------------ bar */
 
 #rh-topbar {
 	position: sticky;
@@ -14,18 +77,18 @@
 	align-items: center;
 	gap: 6px;
 	padding: 4px 10px;
-	background: #14171d;
-	border-bottom: 1px solid #262b34;
+	background: var(--tb-bg);
+	border-bottom: 1px solid var(--tb-edge);
 	font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
 	scrollbar-width: thin;
-	scrollbar-color: #333a45 transparent;
+	scrollbar-color: var(--tb-scrollbar) transparent;
 }
 
 #rh-topbar::-webkit-scrollbar { height: 5px; }
-#rh-topbar::-webkit-scrollbar-thumb { background: #333a45; border-radius: 3px; }
+#rh-topbar::-webkit-scrollbar-thumb { background: var(--tb-scrollbar); border-radius: 3px; }
 
 #rh-topbar .rh-tb-brand {
 	display: flex;
@@ -34,8 +97,8 @@
 	height: 26px;
 	box-sizing: border-box;
 	padding-right: 8px;
-	border-right: 1px solid #2b313b;
-	color: #ee7a28;
+	border-right: 1px solid var(--tb-sep);
+	color: var(--tb-brand);
 	font-weight: 700;
 	font-size: 10px;
 	letter-spacing: 0.05em;
@@ -47,8 +110,8 @@
 #rh-topbar .rh-tb-demo {
 	padding: 1px 6px;
 	border-radius: 3px;
-	background: #3a2a12;
-	color: #f5a623;
+	background: var(--tb-demo-bg);
+	color: var(--tb-demo-fg);
 	font-size: 9px;
 	font-weight: 700;
 	letter-spacing: 0.08em;
@@ -60,7 +123,7 @@
 #rh-topbar .rh-tb-sep {
 	width: 1px;
 	height: 16px;
-	background: #2b313b;
+	background: var(--tb-sep);
 	flex: 0 0 auto;
 	margin: 0 2px;
 }
@@ -74,8 +137,8 @@
 	height: 26px;
 	box-sizing: border-box;
 	padding: 0 9px;
-	background: #1d222b;
-	border: 1px solid #262b34;
+	background: var(--tb-tile-bg);
+	border: 1px solid var(--tb-tile-border);
 	border-radius: 6px;
 	flex: 0 0 auto;
 }
@@ -86,8 +149,8 @@
 	width: 20px;
 	height: 20px;
 	border-radius: 5px;
-	background: #262d38;
-	color: #8fb7ff;
+	background: var(--tb-icon-bg);
+	color: var(--tb-icon-fg);
 	flex: 0 0 auto;
 }
 #rh-topbar .rh-tb-icon svg { width: 13px; height: 13px; }
@@ -98,31 +161,34 @@
 	font-weight: 600;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	color: #7d8798;
+	color: var(--tb-label);
 }
 #rh-topbar .rh-tb-value {
 	font-size: 13px;
 	font-weight: 700;
-	color: #eaeef4;
+	color: var(--tb-value);
 	font-variant-numeric: tabular-nums;
 }
 #rh-topbar .rh-tb-value .rh-tb-unit {
 	font-size: 10px;
 	font-weight: 600;
-	color: #9aa4b3;
+	color: var(--tb-unit);
 	margin-left: 1px;
 }
 
 /* Core temperature - emphasised (important) with its own icon colour */
-#rh-topbar .rh-tb-core { border-color: #43302b; }
-#rh-topbar .rh-tb-core .rh-tb-icon { background: #3a2320; color: #ff9d7a; }
+#rh-topbar .rh-tb-core { border-color: var(--tb-core-border); }
+#rh-topbar .rh-tb-core .rh-tb-icon {
+	background: var(--tb-core-icon-bg);
+	color: var(--tb-core-icon-fg);
+}
 
 /* Battery glyph doubles as the tile icon */
 #rh-topbar .rh-tb-batglyph {
 	position: relative;
 	width: 26px;
 	height: 13px;
-	border: 1.5px solid #4a5261;
+	border: 1.5px solid var(--tb-bat-outline);
 	border-radius: 3px;
 	flex: 0 0 auto;
 }
@@ -133,7 +199,7 @@
 	top: 3px;
 	width: 2.5px;
 	height: 6px;
-	background: #4a5261;
+	background: var(--tb-bat-outline);
 	border-radius: 0 2px 2px 0;
 }
 #rh-topbar .rh-tb-batfill {
@@ -157,7 +223,7 @@
 	padding: 0;
 	font-size: 0;
 	line-height: 1;
-	color: #616c7e;
+	color: var(--tb-more);
 	cursor: pointer;
 	flex: 0 0 auto;
 	-webkit-appearance: none;
@@ -166,7 +232,7 @@
 	border: none;
 }
 #rh-topbar .rh-tb-more svg { display: block; width: 10px; height: 10px; }
-#rh-topbar .rh-tb-more:hover { color: #cdd6e4; }
+#rh-topbar .rh-tb-more:hover { color: var(--tb-more-hover); }
 
 /* Detail popover (appended to <body> so the scrolling bar can't clip it).
    width:max-content keeps it hugging its contents, never full-screen. */
@@ -176,11 +242,11 @@
 	width: max-content;
 	max-width: 280px;
 	box-sizing: border-box;
-	background: #1d222b;
-	border: 1px solid #313846;
+	background: var(--tb-pop-bg);
+	border: 1px solid var(--tb-pop-border);
 	border-radius: 7px;
 	padding: 7px 9px;
-	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+	box-shadow: var(--tb-pop-shadow);
 	font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	text-align: left;
 }
@@ -189,7 +255,7 @@
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: #6b7688;
+	color: var(--tb-pop-title);
 	margin-bottom: 5px;
 }
 .rh-tb-pop-row {
@@ -201,27 +267,27 @@
 .rh-tb-pop-key {
 	flex: 0 0 auto;
 	min-width: 58px;
-	color: #7d8798;
+	color: var(--tb-label);
 	font-size: 10px;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.03em;
 }
 .rh-tb-pop-val {
-	color: #eaeef4;
+	color: var(--tb-value);
 	font-size: 12px;
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 }
 .rh-tb-pop-val .rh-tb-pop-sub {
-	color: #7d8798;
+	color: var(--tb-label);
 	font-weight: 600;
 	font-size: 10px;
 	margin-left: 6px;
 }
 
 #rh-topbar .rh-tb-empty {
-	color: #5c6572;
+	color: var(--tb-empty);
 	font-size: 11px;
 	font-style: italic;
 }

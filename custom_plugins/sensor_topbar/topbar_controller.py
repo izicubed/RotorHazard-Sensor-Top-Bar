@@ -34,6 +34,7 @@ OPT_CAPACITY = 'topbar_batt_capacity'
 OPT_METHOD = 'topbar_batt_method'
 OPT_INTERVAL = 'topbar_interval'
 OPT_DEMO = 'topbar_demo'
+OPT_THEME = 'topbar_theme'
 
 # Standard resting per-cell LiPo discharge curve (voltage -> percent), used as
 # the shape of the estimate. It is rescaled to the user's configured per-cell
@@ -129,6 +130,18 @@ class TopBarController:
             ],
             desc='LiPo curve is more accurate for lithium packs; linear is a '
                  'straight voltage-to-percent map.'),
+            PLUGIN_ID)
+
+        fields.register_option(UIField(
+            name=OPT_THEME, label='Theme',
+            field_type=UIFieldType.SELECT, value='dark',
+            options=[
+                UIFieldSelectOption('dark', 'Dark'),
+                UIFieldSelectOption('light', 'Light'),
+                UIFieldSelectOption('auto', 'Auto (follow browser/OS)'),
+            ],
+            desc='Colour scheme of the top bar. Auto follows each viewer\'s '
+                 'browser/OS light-dark preference.'),
             PLUGIN_ID)
 
         fields.register_option(UIField(
@@ -390,6 +403,7 @@ class TopBarController:
             'network': self._network_info(),
             'system': self._demo_system() if demo else self._system_info(),
             'demo': demo,
+            'theme': self._opt(OPT_THEME, 'dark'),
         }
 
     # ---------------------------------------------------------------- system

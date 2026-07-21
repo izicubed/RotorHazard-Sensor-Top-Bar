@@ -44,6 +44,33 @@
 	var pinnedKey = null;
 	var popEl = null;
 
+	// ------------------------------------------------------------------ theme
+	// 'dark' (default), 'light', or 'auto' (follow the browser/OS preference).
+	// Delivered by the server in every payload from the plugin's Theme option.
+	var theme = 'dark';
+	var lightMq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+	var lastData = null;
+
+	function isLight() {
+		if (theme === 'light') return true;
+		if (theme === 'auto') return !!(lightMq && lightMq.matches);
+		return false;
+	}
+
+	function applyTheme() {
+		var bar = document.getElementById('rh-topbar');
+		if (bar) bar.classList.toggle('rh-tb-light', isLight());
+		if (popEl) popEl.classList.toggle('rh-tb-light', isLight());
+	}
+
+	// Status colours (battery charge / system load) per scheme: the dark set is
+	// too pale on a white bar, so the light scheme uses deeper shades.
+	var STATUS = {
+		dark:  { ok: '#3ddc84', warn: '#f5a623', crit: '#ff5252' },
+		light: { ok: '#1e9e57', warn: '#b97700', crit: '#d63333' }
+	};
+	function statusColors() { return isLight() ? STATUS.light : STATUS.dark; }
+
 	function categorize(reading, units) {
 		var r = String(reading || '').toLowerCase();
 		var u = String(units || '').toLowerCase();
@@ -98,16 +125,18 @@
 	}
 
 	function batColor(pct) {
-		if (pct <= 20) return '#ff5252';
-		if (pct <= 50) return '#f5a623';
-		return '#3ddc84';
+		var c = statusColors();
+		if (pct <= 20) return c.crit;
+		if (pct <= 50) return c.warn;
+		return c.ok;
 	}
 
 	// Load colour: green normally, amber past `warn`, red past `crit`.
 	function loadColor(pct, warn, crit) {
-		if (pct >= crit) return '#ff5252';
-		if (pct >= warn) return '#f5a623';
-		return '#3ddc84';
+		var c = statusColors();
+		if (pct >= crit) return c.crit;
+		if (pct >= warn) return c.warn;
+		return c.ok;
 	}
 
 	function el(tag, cls, html) {
@@ -138,7 +167,7 @@
 
 	function showPopover(anchor, contentNode) {
 		hidePopover();
-		popEl = el('div', 'rh-tb-popover');
+		popEl = el('div', 'rh-tb-popover' + (isLight() ? ' rh-tb-light' : ''));
 		popEl.appendChild(contentNode);
 		document.body.appendChild(popEl);
 		var r = anchor.getBoundingClientRect();
@@ -312,6 +341,9 @@
 	// ------------------------------------------------------------------- render
 
 	function render(bar, data) {
+		lastData = data;
+		if (data && data.theme && data.theme !== theme) theme = data.theme;
+		applyTheme();
 		bar.innerHTML = '';
 
 		bar.appendChild(el('div', 'rh-tb-brand', ICONS.gauge + '<span>Telemetry</span>'));
@@ -363,6 +395,14 @@
 		document.addEventListener('click', function () {
 			if (pinnedKey !== null) { pinnedKey = null; hidePopover(); }
 		});
+		// In Auto mode follow live OS/browser scheme changes.
+		if (lightMq) {
+			var onScheme = function () {
+				if (theme === 'auto') { render(bar, lastData); }
+			};
+			if (lightMq.addEventListener) lightMq.addEventListener('change', onScheme);
+			else if (lightMq.addListener) lightMq.addListener(onScheme);
+		}
 	}
 
 	if (document.readyState === 'loading') {
