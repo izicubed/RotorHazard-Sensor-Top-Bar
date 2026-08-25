@@ -1,16 +1,17 @@
 # Sensor Top Bar (RotorHazard plugin)
 
 A modern, flat-design bar pinned to the top of the page, showing live
-telemetry from whatever sensors are installed — plus live Raspberry Pi load.
+telemetry from whatever sensors are installed — plus live host-system load.
 Comes with **dark**, **light** and **auto** (follow browser/OS) colour themes.
 
 - **Network** — connection type (Wi-Fi / Ethernet / both); the IP address(es)
   and adapter names appear on hover or when you click the chevron.
 - **Core temperature** (Raspberry Pi), emphasised as the most important reading.
-- **System** — live Raspberry Pi load: **CPU** usage %, **RAM** usage %, and
+- **System** — live Linux/Raspberry Pi or Windows load: **CPU** usage %, **RAM** usage %, and
   **free disk** space. Load averages, MB used/total and GB free/used/total
   appear on hover / click. Values turn amber then red as usage climbs.
-- **Battery** — charge **%** with a colour-coded glyph, plus pack voltage.
+- **Battery** — charge **%** with a colour-coded glyph, plus pack voltage when
+  supplied by a RotorHazard sensor. Windows host battery is used as a fallback.
   Per-cell voltage, current, power and estimated mAh remaining appear on
   hover / click.
 - **Climate** — outside temperature, humidity, pressure.
@@ -55,15 +56,17 @@ Because RotorHazard offers no hook for a plugin to add global scripts to
 pages where telemetry is most useful. (The plain landing/Event/Current pages
 do not host plugin panels, so the bar does not appear there.)
 
-## Raspberry Pi load (CPU / RAM / Disk)
+## Host load (CPU / RAM / Disk)
 
-The System group reads the Pi's load with pure standard-library helpers — no
+The System group reads the host's load with pure standard-library helpers — no
 `psutil` dependency:
 
-- **CPU %** — whole-CPU busy percentage from `/proc/stat` deltas, plus load
-  averages via `os.getloadavg()`.
-- **RAM** — used/total MB and percent from `/proc/meminfo`.
-- **Disk** — free/used/total GB and percent for `/` via `os.statvfs`.
+- **Linux / Raspberry Pi** — CPU from `/proc/stat`, RAM from `/proc/meminfo`,
+  and disk via `os.statvfs`.
+- **Windows** — CPU from `GetSystemTimes`, RAM from `GlobalMemoryStatusEx`, and
+  disk via `shutil.disk_usage`.
+- **Windows host battery** — used as a charge-percentage fallback when no
+  RotorHazard voltage sensor is installed.
 
 Each field degrades gracefully: a tile is simply hidden if the reading is
 unavailable on the current platform.

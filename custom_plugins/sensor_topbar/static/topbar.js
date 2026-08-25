@@ -241,13 +241,17 @@
 		t.appendChild(glyph);
 
 		var text = el('div', 'rh-tb-text');
+		var hasVoltage = b.voltage != null && Number.isFinite(Number(b.voltage));
+		var voltage = hasVoltage
+			? ' ' + b.voltage + '<span class="rh-tb-unit">V</span>' : '';
 		text.appendChild(el('div', 'rh-tb-value',
-			'<span style="color:' + color + '">' + b.percent + '%</span> ' +
-			b.voltage + '<span class="rh-tb-unit">V</span>'));
+			'<span style="color:' + color + '">' + b.percent + '%</span>' + voltage));
 		t.appendChild(text);
 
 		attachPopover(t, 'bat', function () {
-			var rows = [['Charge', b.percent + '%'], ['Voltage', b.voltage + ' V']];
+			var rows = [['Charge', b.percent + '%']];
+			if (hasVoltage) rows.push(['Voltage', b.voltage + ' V']);
+			if (b.host) rows.push(['Power', b.ac_online ? 'AC connected' : 'On battery']);
 			if (b.cells) rows.push(['Cells', b.cells + 'S']);
 			if (b.per_cell) rows.push(['Per cell', b.per_cell.toFixed(2) + ' V']);
 			if (b.current != null) rows.push(['Current', b.current.toFixed(2) + ' A']);

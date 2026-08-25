@@ -390,6 +390,10 @@ class TopBarController:
         demo = self._opt_bool(OPT_DEMO)
         readings = self._demo_readings() if demo else self._read_all()
         battery = self._compute_battery(readings)
+        if not demo and not battery.get('present'):
+            host_battery = self._host_battery()
+            if host_battery:
+                battery = host_battery
 
         # Metrics = every reading except those already shown in the battery tile
         # (its voltage source plus that sensor's current/power).
@@ -409,11 +413,11 @@ class TopBarController:
     # ---------------------------------------------------------------- system
 
     def _system_info(self):
-        '''Raspberry Pi load: CPU %, RAM usage, and free disk space.
+        '''Host load: CPU %, RAM usage, and free disk space.
 
-        Pure-stdlib readers (/proc + os.statvfs) so no extra dependency such as
-        psutil is needed. Each sub-reader degrades gracefully: a field is simply
-        omitted (and its tile hidden) when it cannot be read on this platform.
+        Pure-stdlib readers support Linux/Raspberry Pi and Windows, so no extra
+        dependency such as psutil is needed. Each sub-reader degrades
+        gracefully when a reading is unavailable.
         '''
         info = {}
         cpu = self._cpu_percent()
@@ -442,7 +446,7 @@ class TopBarController:
             with open('/proc/stat') as f:
                 line = f.readline()
         except Exception:
-            return None
+            return self._windows_cpu_percent()
         parts = line.split()
         if not parts or parts[0] != 'cpu':
             return None
@@ -461,6 +465,39 @@ class TopBarController:
         if d_total <= 0:
             return None
         return round((1.0 - d_idle / d_total) * 100.0, 1)
+
+    def _windows_cpu_percent(self):
+        '''Whole-CPU busy percentage from Win32 GetSystemTimes.'''
+        if os.name != 'nt':
+            return None
+        try:
+            import ctypes
+            from ctypes import wintypes
+
+            idle_ft = wintypes.FILETIME()
+            kernel_ft = wintypes.FILETIME()
+            user_ft = wintypes.FILETIME()
+            if not ctypes.windll.kernel32.GetSystemTimes(
+                    ctypes.byref(idle_ft), ctypes.byref(kernel_ft),
+                    ctypes.byref(user_ft)):
+                return None
+
+            def ticks(value):
+                return (value.dwHighDateTime << 32) | value.dwLowDateTime
+
+            idle = ticks(idle_ft)
+            total = ticks(kernel_ft) + ticks(user_ft)
+            prev = self._cpu_prev
+            self._cpu_prev = (total, idle)
+            if prev is None:
+                return None
+            d_total = total - prev[0]
+            d_idle = idle - prev[1]
+            if d_total <= 0:
+                return None
+            return round((1.0 - d_idle / d_total) * 100.0, 1)
+        except Exception:
+            return None
 
     def _mem_info(self):
         '''RAM usage from /proc/meminfo (uses MemAvailable when present).'''
@@ -482,6 +519,75 @@ class TopBarController:
                 'total_mb': int(round(total_kb / 1024.0)),
                 'used_mb': int(round(used_kb / 1024.0)),
                 'percent': round(used_kb / total_kb * 100.0, 1) if total_kb else 0.0,
+            }
+        except Exception:
+            return self._windows_mem_info()
+
+    def _windows_mem_info(self):
+        '''Physical-memory usage from Win32 GlobalMemoryStatusEx.'''
+        if os.name != 'nt':
+            return None
+        try:
+            import ctypes
+
+            class MemoryStatusEx(ctypes.Structure):
+                _fields_ = [
+                    ('dwLength', ctypes.c_ulong),
+                    ('dwMemoryLoad', ctypes.c_ulong),
+                    ('ullTotalPhys', ctypes.c_ulonglong),
+                    ('ullAvailPhys', ctypes.c_ulonglong),
+                    ('ullTotalPageFile', ctypes.c_ulonglong),
+                    ('ullAvailPageFile', ctypes.c_ulonglong),
+                    ('ullTotalVirtual', ctypes.c_ulonglong),
+                    ('ullAvailVirtual', ctypes.c_ulonglong),
+                    ('ullAvailExtendedVirtual', ctypes.c_ulonglong),
+                ]
+
+            status = MemoryStatusEx()
+            status.dwLength = ctypes.sizeof(status)
+            if not ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)):
+                return None
+            mib = 1024.0 ** 2
+            total_mb = int(round(status.ullTotalPhys / mib))
+            available_mb = int(round(status.ullAvailPhys / mib))
+            return {
+                'total_mb': total_mb,
+                'used_mb': max(0, total_mb - available_mb),
+                'percent': round(float(status.dwMemoryLoad), 1),
+            }
+        except Exception:
+            return None
+
+    def _host_battery(self):
+        '''Windows host battery status when no voltage sensor exists.'''
+        if os.name != 'nt':
+            return None
+        try:
+            import ctypes
+
+            class SystemPowerStatus(ctypes.Structure):
+                _fields_ = [
+                    ('ac_line_status', ctypes.c_ubyte),
+                    ('battery_flag', ctypes.c_ubyte),
+                    ('battery_percent', ctypes.c_ubyte),
+                    ('system_status_flag', ctypes.c_ubyte),
+                    ('battery_life_time', ctypes.c_ulong),
+                    ('battery_full_life_time', ctypes.c_ulong),
+                ]
+
+            status = SystemPowerStatus()
+            if not ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(status)):
+                return None
+            if status.battery_flag == 128 or status.battery_percent == 255:
+                return None
+            remaining = None if status.battery_life_time == 0xFFFFFFFF else int(status.battery_life_time)
+            return {
+                'present': True,
+                'percent': int(status.battery_percent),
+                'host': True,
+                'ac_online': status.ac_line_status == 1,
+                'seconds_remaining': remaining,
+                'source': 'Windows host battery',
             }
         except Exception:
             return None

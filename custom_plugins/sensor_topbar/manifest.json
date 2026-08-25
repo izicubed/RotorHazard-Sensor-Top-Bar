@@ -3,10 +3,10 @@
     "name": "Sensor Top Bar",
     "author": "izicubed",
     "author_uri": "https://github.com/izicubed",
-    "description": "A modern flat-design top bar shown on every page that displays live telemetry from installed sensors: battery voltage and charge %, Raspberry Pi core temperature, outside temperature, pressure, humidity, current and more. Also shows live Raspberry Pi load - CPU usage, RAM usage and free disk space. Battery percentage is computed from a configurable cell count, per-cell voltage range and pack capacity (mAh). Includes a demo mode so the bar can be exercised on a PC with no hardware attached. Dark, light and auto (follow browser/OS) colour themes.",
+    "description": "A modern flat-design top bar shown on every page that displays live telemetry from installed sensors: battery voltage and charge %, Raspberry Pi core temperature, outside temperature, pressure, humidity, current and more. Also shows live host load - CPU usage, RAM usage and free disk space on Linux and Windows. Battery percentage is computed from a configurable cell count, per-cell voltage range and pack capacity (mAh), with Windows host-battery fallback. Includes a demo mode so the bar can be exercised on a PC with no hardware attached. Dark, light and auto (follow browser/OS) colour themes.",
     "documentation_uri": "https://github.com/izicubed/RotorHazard-Sensor-Top-Bar",
     "license": "RotorHazard",
     "license_uri": "https://github.com/RotorHazard/RotorHazard/blob/main/LICENSE",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "required_rhapi_version": "1.0"
 }
